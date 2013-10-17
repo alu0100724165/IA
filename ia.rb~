@@ -54,7 +54,7 @@ class Matriz
 			x=1+rand(t)
 			y=1+rand(t)
 
-			while @a[y][x] == [1][1]
+			while (x==1 && y==1) || (x==1 && y==2)  || @a[x][y]=='O'
 				x=1+rand(t)
 				y=1+rand(t)
 			end	
@@ -76,10 +76,17 @@ class Cortador < Matriz
 		@reciclaje=Array.new()
 		@pos=0
 		@pos1=0
+		@aux=Array.new()
 		@pudo_mover=false
+		@cont=0
 	end
 
 	def mover 
+		@t= (@u_posiciones.length-1)
+			if @u_posiciones.length==1
+				@matriz[0][1]='H'
+			end
+
 			if (@matriz[@y-1][@x]=='*') #Arriba
 				@matriz[@y][@x]='x'
 				@y=@y-1
@@ -106,26 +113,34 @@ class Cortador < Matriz
 			end
 		
 			if @pudo_mover==true
-				@u_posiciones[@pos]=[@y,@x,'']
-				@pos=@pos+1
+				
+				
+					for i in (0..@aux.length-1)
+						@u_posiciones[@pos]=@aux[0]
+						@aux.shift
+						@pos=@pos+1
+							
+					end
+					
+					@u_posiciones[@pos]=[@y,@x,' ']
+					@pos=@pos+1
+					@cont=0
+					@pos1=0
 			else	
-				@t= (@u_posiciones.length-1)
 				
 				puts "entro"
-				puts @t					
-					
-					if @u_posiciones[@t][2]!='*'
-						@u_posiciones[@t][2]='*'
-						@t=@t-1	
-						@x=@u_posiciones[@t][1]
-						@y=@u_posiciones[@t][0]	
-						#@pos=@pos-1	
-					end	
+				puts @t
 						
-					puts "entro2"			
-					@matriz[@y][@x]='L'
+				@t=@t-@cont
+				@cont=@cont+1														
+				@y=@u_posiciones[@t][0]				
+				@x=@u_posiciones[@t][1]
+				@aux.push([@y,@x,'*'])
+					
+				
+				@matriz[@y][@x]='L'
 			end
-		if (@u_posiciones==[])
+		if (@matriz[1][1]=='L' && @u_posiciones.length>2)
 			return true	
 		else
 			return false
@@ -139,6 +154,7 @@ class Cortador < Matriz
 		return posiciones.drop(0)	
 	end
 
+end
 =begin
 Este es el método para mostrar el array
 =end
@@ -162,10 +178,12 @@ cortado=false
 	while (cortado!=true)  
 		matriz.mostrar_Matriz
 		cortado=cortador.mover
-		sleep(0.7)		
+		sleep(0.1)		
 		system'clear' 
-		puts "\n---------------------\n"
+=begin		puts "\n---------------------\n"
 		print cortador.get_posiciones
 		puts "\n---------------------\n"
+=end	
 	end
-return nil
+matriz.mostrar_Matriz
+
